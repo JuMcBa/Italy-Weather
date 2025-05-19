@@ -4,62 +4,89 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tuscany Weather Forecast</title>
-  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.6/Babel.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 16px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 375px; /* Optimized for iPhone */
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 24px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .note {
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .weather-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+    }
+    .weather-card div:first-child {
+      flex: 1;
+    }
+    .weather-card h3 {
+      font-size: 18px;
+      margin: 0 0 8px;
+    }
+    .weather-card p {
+      font-size: 14px;
+      color: #666;
+      margin: 4px 0;
+    }
+    .weather-card .icon {
+      font-size: 32px;
+    }
+  </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="text/babel">
-    const WeatherCard = ({ date, day, high, low, condition, icon }) => (
-      <div className="bg-white rounded-lg shadow-md p-4 mb-4 flex items-center">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold">{day}, {date}</h3>
-          <p className="text-gray-600">High: {high}°F / Low: {low}°F</p>
-          <p className="text-gray-600">{condition}</p>
+  <div class="container">
+    <h1>Tuscany Weather Forecast</h1>
+    <p class="note">Forecast for June 14–21, 2025 (Mock data). Check real-time weather closer to your trip.</p>
+    <div id="weather-list"></div>
+  </div>
+  <script>
+    const weatherData = [
+      { date: "June 14", day: "Saturday", high: 79, low: 61, condition: "Sunny", icon: "☀️" },
+      { date: "June 15", day: "Sunday", high: 81, low: 63, condition: "Mostly Sunny", icon: "🌤️" },
+      { date: "June 16", day: "Monday", high: 77, low: 59, condition: "Partly Cloudy", icon: "⛅" },
+      { date: "June 17", day: "Tuesday", high: 75, low: 57, condition: "Scattered Showers", icon: "🌦️" },
+      { date: "June 18", day: "Wednesday", high: 79, low: 61, condition: "Sunny", icon: "☀️" },
+      { date: "June 19", day: "Thursday", high: 82, low: 64, condition: "Clear", icon: "🌞" },
+      { date: "June 20", day: "Friday", high: 81, low: 63, condition: "Mostly Sunny", icon: "🌤️" },
+      { date: "June 21", day: "Saturday", high: 79, low: 61, condition: "Partly Cloudy", icon: "⛅" },
+    ];
+
+    const weatherList = document.getElementById('weather-list');
+    weatherData.forEach(day => {
+      const card = document.createElement('div');
+      card.className = 'weather-card';
+      card.innerHTML = `
+        <div>
+          <h3>${day.day}, ${day.date}</h3>
+          <p>High: ${day.high}°F / Low: ${day.low}°F</p>
+          <p>${day.condition}</p>
         </div>
-        <div className="text-4xl">{icon}</div>
-      </div>
-    );
+        <div class="icon">${day.icon}</div>
+      `;
+      weatherList.appendChild(card);
+    });
 
-    const App = () => {
-      const weatherData = [
-        { date: "June 14", day: "Saturday", high: 79, low: 61, condition: "Sunny", icon: "☀️" },
-        { date: "June 15", day: "Sunday", high: 81, low: 63, condition: "Mostly Sunny", icon: "🌤️" },
-        { date: "June 16", day: "Monday", high: 77, low: 59, condition: "Partly Cloudy", icon: "⛅" },
-        { date: "June 17", day: "Tuesday", high: 75, low: 57, condition: "Scattered Showers", icon: "🌦️" },
-        { date: "June 18", day: "Wednesday", high: 79, low: 61, condition: "Sunny", icon: "☀️" },
-        { date: "June 19", day: "Thursday", high: 82, low: 64, condition: "Clear", icon: "🌞" },
-        { date: "June 20", day: "Friday", high: 81, low: 63, condition: "Mostly Sunny", icon: "🌤️" },
-        { date: "June 21", day: "Saturday", high: 79, low: 61, condition: "Partly Cloudy", icon: "⛅" },
-      ];
-
-      return (
-        <div className="min-h-screen bg-gray-100 p-4">
-          <h1 className="text-2xl font-bold text-center mb-6">Tuscany Weather Forecast</h1>
-          <p className="text-center text-gray-600 mb-4">
-            Forecast for June 14–21, 2025 (Mock data). Check real-time weather closer to your trip.
-          </p>
-          <div className="max-w-md mx-auto">
-            {weatherData.map((day, index) => (
-              <WeatherCard
-                key={index}
-                date={day.date}
-                day={day.day}
-                high={day.high}
-                low={day.low}
-                condition={day.condition}
-                icon={day.icon}
-              />
-            ))}
-          </div>
-        </div>
-      );
-    };
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
+    console.log("Weather cards rendered successfully");
   </script>
 </body>
 </html>
