@@ -21,6 +21,11 @@
       text-align: center;
       margin-bottom: 16px;
     }
+    h2 {
+      font-size: 20px;
+      text-align: center;
+      margin: 16px 0;
+    }
     .note {
       font-size: 14px;
       color: #666;
@@ -51,16 +56,24 @@
     .weather-card .icon {
       font-size: 32px;
     }
+    #current-weather {
+      margin-bottom: 24px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Tuscany Weather Forecast</h1>
-    <p class="note">Historical averages for June 14–21 in Florence, Tuscany. Check real-time weather closer to your 2025 trip.</p>
+    <h2>Current Weather in Florence</h2>
+    <div id="current-weather"></div>
+    <h2>Historical Averages (June 14–21, 2025)</h2>
+    <p class="note">Averages for Florence, Tuscany. Check real-time weather closer to your 2025 trip.</p>
     <div id="weather-list"></div>
   </div>
   <script>
-    const weatherData = [
+    console.log("Starting app render...");
+    // Historical averages for June 14–21, 2025
+    const historicalData = [
       { date: "June 14", day: "Saturday", high: 80, low: 60, condition: "Mostly Sunny", icon: "🌤️" },
       { date: "June 15", day: "Sunday", high: 81, low: 61, condition: "Sunny", icon: "☀️" },
       { date: "June 16", day: "Monday", high: 79, low: 59, condition: "Partly Cloudy", icon: "⛅" },
@@ -71,8 +84,9 @@
       { date: "June 21", day: "Saturday", high: 81, low: 61, condition: "Mostly Sunny", icon: "🌤️" },
     ];
 
+    // Render historical weather
     const weatherList = document.getElementById('weather-list');
-    weatherData.forEach(day => {
+    historicalData.forEach(day => {
       const card = document.createElement('div');
       card.className = 'weather-card';
       card.innerHTML = `
@@ -85,8 +99,55 @@
       `;
       weatherList.appendChild(card);
     });
+    console.log("Historical weather cards rendered successfully");
 
-    console.log("Weather cards rendered successfully");
+    // Fetch current weather from OpenWeatherMap
+    const apiKey = '4843340952fa0ba9bdd784f8ce325696';
+    const currentWeatherDiv = document.getElementById('current-weather');
+    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=43.779&lon=11.246&units=imperial&appid=${apiKey}`)
+      .then(response => {
+        if (!response.ok) throw new Error(`API request failed: ${response.status}`);
+        return response.json();
+      })
+      .then(data => {
+        const temp = Math.round(data.main.temp);
+        const high = Math.round(data.main.temp_max);
+        const low = Math.round(data.main.temp_min);
+        const condition = data.weather[0].main;
+        const icon = getWeatherIcon(condition);
+        const card = document.createElement('div');
+        card.className = 'weather-card';
+        card.innerHTML = `
+          <div>
+            <h3>Today, ${new Date().toLocaleDateString()}</h3>
+            <p>Current: ${temp}°F (High: ${high}°F / Low: ${low}°F)</p>
+            <p>${condition}</p>
+          </div>
+          <div class="icon">${icon}</div>
+        `;
+        currentWeatherDiv.appendChild(card);
+        console.log("Current weather rendered successfully");
+      })
+      .catch(error => {
+        console.error("Error fetching current weather:", error);
+        currentWeatherDiv.innerHTML = '<p class="note">Failed to load current weather. Check network or try again later.</p>';
+      });
+
+    // Map weather conditions to emoji icons
+    function getWeatherIcon(condition) {
+      const icons = {
+        Clear: '☀️',
+        Clouds: '⛅',
+        Rain: '🌧️',
+        Drizzle: '🌦️',
+        Thunderstorm: '⛈️',
+        Snow: '❄️',
+        Mist: '🌫️',
+        Fog: '🌫️'
+      };
+      return icons[condition] || '🌥️';
+    }
+    console.log("App render complete");
   </script>
 </body>
 </html>
