@@ -3,75 +3,114 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tuscany Weather Forecast</title>
+  <title>Tuscany Weather</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #F7F7F7;
       margin: 0;
-      padding: 16px;
+      padding: 20px;
       min-height: 100vh;
+      color: #333;
     }
     .container {
-      max-width: 375px; /* Optimized for iPhone */
+      max-width: 375px; /* iPhone-friendly */
       margin: 0 auto;
     }
     h1 {
       font-size: 24px;
+      font-weight: 500;
       text-align: center;
-      margin-bottom: 16px;
+      margin-bottom: 24px;
+      color: #333;
     }
     h2 {
-      font-size: 20px;
+      font-size: 18px;
+      font-weight: 500;
       text-align: center;
-      margin: 16px 0;
+      margin: 28px 0 16px;
+      color: #4A90E2;
     }
     .note {
-      font-size: 14px;
+      font-size: 13px;
       color: #666;
       text-align: center;
       margin-bottom: 16px;
+      line-height: 1.5;
     }
     .weather-card {
       background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
       padding: 16px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
+      border: 1px solid #E8ECEF;
+      cursor: pointer;
     }
     .weather-card div:first-child {
       flex: 1;
     }
     .weather-card h3 {
-      font-size: 18px;
-      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 500;
+      margin: 0 0 6px;
     }
     .weather-card p {
-      font-size: 14px;
+      font-size: 13px;
       color: #666;
-      margin: 4px 0;
+      margin: 3px 0;
     }
     .weather-card .icon {
-      font-size: 32px;
+      font-size: 28px;
     }
     #current-weather {
-      margin-bottom: 24px;
+      margin-bottom: 20px;
+    }
+    .wine-recommendations {
+      display: none;
+      background-color: #FAFAFA;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 8px;
+      border: 1px solid #E8ECEF;
+      font-size: 12px;
+      color: #333;
+      animation: fadeIn 0.3s ease-out;
+    }
+    .wine-recommendations.active {
+      display: block;
+    }
+    .wine-recommendations h4 {
+      font-size: 14px;
+      font-weight: 500;
+      margin: 0 0 8px;
+      color: #4A90E2;
+    }
+    .wine-recommendations ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .wine-recommendations li {
+      margin-bottom: 6px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Tuscany Weather Forecast</h1>
+    <h1>Tuscany Weather</h1>
     <h2>Current Weather in Florence</h2>
     <div id="current-weather"></div>
-    <h2>Historical Averages (June 14–21, 2025)</h2>
-    <p class="note">Averages for Florence, Tuscany. Check real-time weather closer to your 2025 trip.</p>
+    <h2>June 14–21, 2025 Forecast</h2>
+    <p class="note">Averages for Florence, Tuscany. Tap a day for wine pairing recommendations. Check real-time weather closer to your 2025 trip.</p>
     <div id="weather-list"></div>
   </div>
   <script>
-    console.log("Starting app render...");
     // Historical averages for June 14–21, 2025
     const historicalData = [
       { date: "June 14", day: "Saturday", high: 80, low: 60, condition: "Mostly Sunny", icon: "🌤️" },
@@ -84,53 +123,136 @@
       { date: "June 21", day: "Saturday", high: 81, low: 61, condition: "Mostly Sunny", icon: "🌤️" },
     ];
 
-    // Render historical weather
-    const weatherList = document.getElementById('weather-list');
-    historicalData.forEach(day => {
+    // Wine recommendations based on weather condition
+    function getWineRecommendations(condition) {
+      switch (condition.toLowerCase()) {
+        case "sunny":
+        case "mostly sunny":
+          return {
+            lunch: [
+              "Vernaccia di San Gimignano - Crisp, citrusy, perfect for sunny days with light salads or seafood.",
+              "Vermentino (Bolgheri) - Light, mineral-driven, ideal with grilled vegetables or fish.",
+            ],
+            dinner: [
+              "Chianti Classico - Medium-bodied, cherry notes, great with pasta or grilled meats.",
+              "Rosso di Montalcino - Lighter Sangiovese, pairs well with Tuscan stews.",
+            ]
+          };
+        case "partly cloudy":
+          return {
+            lunch: [
+              "Vermentino (Maremma) - Fresh, floral, complements cloudy days with antipasti.",
+              "Trebbiano Toscano - Light, appley, suits bruschetta or crostini.",
+            ],
+            dinner: [
+              "Vino Nobile di Montepulciano - Elegant, plummy, ideal with roasted meats.",
+              "Chianti Rufina - Earthy, versatile for pasta with mushroom sauces.",
+            ]
+          };
+        case "scattered showers":
+          return {
+            lunch: [
+              "Chardonnay (Tuscany) - Rich, oaky, pairs with creamy soups or risotto.",
+              "Vernaccia di San Gimignano Riserva - Full-bodied, great with truffle dishes.",
+            ],
+            dinner: [
+              "Brunello di Montalcino - Robust, complex, perfect with Bistecca alla Fiorentina.",
+              "Bolgheri Superiore - Cabernet blend, suits hearty game dishes.",
+            ]
+          };
+        default:
+          return {
+            lunch: ["Vernaccia di San Gimignano - Versatile white for any weather."],
+            dinner: ["Chianti Classico - Reliable red for any Tuscan meal."]
+          };
+      }
+    }
+
+    // Render weather card
+    function renderWeatherCard(container, dayData, isCurrent = false) {
       const card = document.createElement('div');
       card.className = 'weather-card';
+      const dateStr = isCurrent ? new Date().toLocaleDateString() : dayData.date;
+      const conditionStr = isCurrent && dayData.isMock ? `${dayData.condition} (Mock data due to API error)` : dayData.condition;
       card.innerHTML = `
         <div>
-          <h3>${day.day}, ${day.date}</h3>
-          <p>High: ${day.high}°F / Low: ${day.low}°F</p>
-          <p>${day.condition}</p>
+          <h3>${isCurrent ? 'Today' : dayData.day}, ${dateStr}</h3>
+          ${isCurrent ? `
+            <p>Current: ${dayData.temp}°F</p>
+            <p>Historical Avg: ${dayData.historicalHigh}°F / ${dayData.historicalLow}°F</p>
+          ` : `
+            <p>High: ${dayData.high}°F / Low: ${dayData.low}°F</p>
+          `}
+          <p>${conditionStr}</p>
         </div>
-        <div class="icon">${day.icon}</div>
+        <div class="icon">${dayData.icon}</div>
       `;
-      weatherList.appendChild(card);
-    });
+      const wines = getWineRecommendations(dayData.condition);
+      const recommendations = document.createElement('div');
+      recommendations.className = 'wine-recommendations';
+      recommendations.innerHTML = `
+        <h4>Lunch Wines</h4>
+        <ul>
+          ${wines.lunch.map(wine => `<li>${wine}</li>`).join('')}
+        </ul>
+        <h4>Dinner Wines</h4>
+        <ul>
+          ${wines.dinner.map(wine => `<li>${wine}</li>`).join('')}
+        </ul>
+      `;
+      card.appendChild(recommendations);
+      card.addEventListener('click', () => {
+        const isActive = recommendations.classList.contains('active');
+        document.querySelectorAll('.wine-recommendations.active').forEach(el => el.classList.remove('active'));
+        if (!isActive) recommendations.classList.add('active');
+      });
+      container.appendChild(card);
+    }
+
+    // Render historical weather
+    const weatherList = document.getElementById('weather-list');
+    historicalData.forEach(day => renderWeatherCard(weatherList, day));
     console.log("Historical weather cards rendered successfully");
 
-    // Fetch current weather from OpenWeatherMap
-    const apiKey = '4843340952fa0ba9bdd784f8ce325696';
+    // Fetch current weather
+    const apiKey = '4843340952fa0ba9bdd784f8ce325696'; // Provided API key
     const currentWeatherDiv = document.getElementById('current-weather');
     fetch(`https://api.openweathermap.org/data/2.5/weather?lat=43.779&lon=11.246&units=imperial&appid=${apiKey}`)
       .then(response => {
-        if (!response.ok) throw new Error(`API request failed: ${response.status}`);
+        console.log("API response status:", response.status, response.statusText);
+        if (!response.ok) {
+          return response.json().then(errorData => {
+            throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorData.message}`);
+          });
+        }
         return response.json();
       })
       .then(data => {
+        console.log("API data received:", data);
         const temp = Math.round(data.main.temp);
-        const high = Math.round(data.main.temp_max);
-        const low = Math.round(data.main.temp_min);
         const condition = data.weather[0].main;
         const icon = getWeatherIcon(condition);
-        const card = document.createElement('div');
-        card.className = 'weather-card';
-        card.innerHTML = `
-          <div>
-            <h3>Today, ${new Date().toLocaleDateString()}</h3>
-            <p>Current: ${temp}°F (High: ${high}°F / Low: ${low}°F)</p>
-            <p>${condition}</p>
-          </div>
-          <div class="icon">${icon}</div>
-        `;
-        currentWeatherDiv.appendChild(card);
+        renderWeatherCard(currentWeatherDiv, {
+          temp,
+          historicalHigh: 73,
+          historicalLow: 54,
+          condition,
+          icon,
+        }, true);
         console.log("Current weather rendered successfully");
       })
       .catch(error => {
-        console.error("Error fetching current weather:", error);
-        currentWeatherDiv.innerHTML = '<p class="note">Failed to load current weather. Check network or try again later.</p>';
+        console.error("Error fetching current weather:", error.message);
+        // Fallback to mock current weather
+        renderWeatherCard(currentWeatherDiv, {
+          temp: 65,
+          historicalHigh: 73,
+          historicalLow: 54,
+          condition: "Partly Cloudy",
+          icon: "⛅",
+          isMock: true
+        }, true);
+        currentWeatherDiv.insertAdjacentHTML('beforeend', `<p class="note">API Error: ${error.message}. Verify API key at openweathermap.org.</p>`);
       });
 
     // Map weather conditions to emoji icons
@@ -147,7 +269,6 @@
       };
       return icons[condition] || '🌥️';
     }
-    console.log("App render complete");
   </script>
 </body>
 </html>
